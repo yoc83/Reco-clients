@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generali - J'en fais profiter mes proches</title>
+    <style>
+        :root {
+            --generali-red: #AA1B17;
+            --generali-dark-red: #841312;
+            --text-dark: #1f2937;
+            --text-light: #4b5563;
+            --bg-gray: #f4f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-top: 8px solid var(--generali-red);
+            padding: 35px 25px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .logo {
+            max-width: 130px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--generali-red);
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .question-block {
+            margin-bottom: 25px;
+        }
+
+        .question-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        /* 1/ Notation Étoiles */
+        .stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .stars input { display: none; }
+
+        .stars label {
+            font-size: 32px;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .stars label:hover,
+        .stars label:hover ~ label,
+        .stars input:checked ~ label {
+            color: #fbbf24;
+        }
+
+        /* 2/ Cases à cocher */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            background: #f9fafb;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .checkbox-label input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--generali-red);
+        }
+
+        .checkbox-label:hover {
+            border-color: var(--generali-red);
+            background-color: #fef2f2;
+        }
+
+        /* 3/ Boutons Radio */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-label {
+            flex: 1;
+            text-align: center;
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .radio-label input { display: none; }
+
+        .radio-label:has(input:checked) {
+            border-color: var(--generali-red);
+            background-color: var(--generali-red);
+            color: white;
+        }
+
+        /* Boutons d'actions */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 15px;
+        }
+
+        .btn-primary {
+            background-color: transparent;
+            color: var(--generali-red);
+            border: 2px solid var(--generali-red);
+        }
+
+        .btn-primary:hover { background-color: #fef2f2; }
+
+        .btn-submit {
+            background-color: var(--generali-red);
+            color: white;
+            box-shadow: 0 4px 12px rgba(170, 27, 23, 0.2);
+            display: none; /* Reste masqué jusqu'à la sélection de contacts */
+        }
+
+        .btn-submit:hover { background-color: var(--generali-dark-red); }
+        .btn-submit:active { transform: scale(0.99); }
+
+        /* Bloc Répertoire Contacts */
+        .contacts-list {
+            margin-top: 15px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .contacts-list h3 {
+            font-size: 14px;
+            color: #16a34a;
+            margin-bottom: 10px;
+        }
+
+        .contact-item {
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e6fbf0;
+            color: #14532d;
+        }
+
+        .contact-item:last-child { border-bottom: none; }
+
+        .error-msg {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        /* Écran de remerciement final */
+        .thank-you {
+            text-align: center;
+            padding: 40px 10px;
+            display: none;
+        }
+
+        .thank-you h2 {
+            color: var(--generali-red);
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .thank-you p {
+            color: var(--text-light);
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <form id="generaliForm">
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/GENERALI_logo.png" alt="Generali Logo" class="logo">
+            <h1>J'en fais profiter mes proches</h1>
+        </div>
+
+        <div class="question-block">
+            <div class="question-title">1/ Qu'avez-vous pensé de notre entretien ?</div>
+            <div class="stars">
+                <input type="radio" id="star5" name="Note_Entretien" value="5 Étoiles"><label for="star5">★</label>
+                <input type="radio" id="star4" name="Note_Entretien" value="4 Étoiles"><label for="star4">★</label>
+                <input type="radio" id="star3" name="Note_Entretien" value="3 Étoiles"><label for="star3">★</label>
+                <input type="radio" id="star2" name="Note_Entretien" value="2 Étoiles"><label for="star2">★</label>
+                <input type="radio" id="star1" name="Note_Entretien" value="1 Étoile"><label for="star1">★</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-title">2/ Qu'avez-vous le plus apprécié (plusieurs réponses possibles) ?</div>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" name="Plus_Apprecie" value="Les conseils apportés"> Les conseils apportés</label>
+                <label class="checkbox-label"><input type="checkbox" name="Plus_Apprecie" value="Les économies réalisées"> Les économies réalisées</label>
+                <label class="checkbox-label"><input type="checkbox" name="Plus_Apprecie" value="La sympathie de votre conseiller"> La sympathie de votre conseiller</label>
+                <label class="checkbox-label"><input type="checkbox" name="Plus_Apprecie" value="L'étude patrimoniale"> L'étude patrimoniale</label>
+                <label class="checkbox-label"><input type="checkbox" name="Plus_Apprecie" value="L'écoute et la prise en considération"> L'écoute et la prise en considération</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <div class="question-title">3/ Pensez-vous que votre conseiller est recommandable ?</div>
+            <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="Conseiller_Recommandable" value="Oui"> Oui</label>
+                <label class="radio-label"><input type="radio" name="Conseiller_Recommandable" value="Non"> Non</label>
+            </div>
+        </div>
+
+        <div class="question-block" style="margin-bottom: 15px;">
+            <div class="question-title">4/ À qui souhaitez-vous rendre service ?</div>
+            
+            <button type="button" id="btnContacts" class="btn btn-primary">Je choisis mes proches</button>
+            <div id="errorArea" class="error-msg"></div>
+
+            <div id="contactsArea" class="contacts-list">
+                <h3>Proches sélectionnés :</h3>
+                <div id="contactsListTarget"></div>
+            </div>
+        </div>
+
+        <input type="hidden" id="hiddenContactsField" name="Liste_Des_Proches_Selectionnes" value="">
+
+        <button type="submit" id="btnSubmit" class="btn btn-submit">Valider et prévenir mes proches</button>
+    </form>
+
+    <div class="thank-you" id="thankYouScreen">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/GENERALI_logo.png" alt="Generali Logo" class="logo" style="margin-bottom: 25px;">
+        <h2>Je vous remercie pour votre confiance</h2>
+        <p>Votre conseiller Alexis Albertini prendra soin de vos recommandations.</p>
+    </div>
+</div>
+
+<script>
+    let selectedContactsArray = [];
+
+    // Gestion du carnet d'adresses natif
+    document.getElementById('btnContacts').addEventListener('click', async () => {
+        const contactsArea = document.getElementById('contactsArea');
+        const listTarget = document.getElementById('contactsListTarget');
+        const errorArea = document.getElementById('errorArea');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const hiddenField = document.getElementById('hiddenContactsField');
+        
+        errorArea.style.display = "none";
+        listTarget.innerHTML = "";
+        selectedContactsArray = [];
+
+        if (!('contacts' in navigator && 'ContactsManager' in window)) {
+            errorArea.innerHTML = "⚠️ Votre navigateur ou smartphone restreint l'accès direct au répertoire.<br><br><strong>Note :</strong> Vous pouvez tout de même valider le formulaire ou envoyer directement vos contacts à votre conseiller par vos applications habituelles.";
+            errorArea.style.display = "block";
+            btnSubmit.style.display = "block"; // Permet de soumettre le questionnaire sans répertoire compatible
+            return;
+        }
+
+        try {
+            const props = ['name', 'tel'];
+            const contacts = await navigator.contacts.select(props, { multiple: true });
+            
+            if (contacts.length > 0) {
+                contactsArea.style.display = "block";
+                btnSubmit.style.display = "block";
+                
+                let textFormattedList = "";
+
+                contacts.forEach(contact => {
+                    const name = contact.name && contact.name[0] ? contact.name[0] : "Inconnu";
+                    const phone = contact.tel && contact.tel[0] ? contact.tel[0] : "Pas de numéro";
+                    
+                    selectedContactsArray.push({ name: name, phone: phone });
+                    textFormattedList += `${name} : ${phone} | `;
+
+                    const div = document.createElement('div');
+                    div.className = 'contact-item';
+                    div.innerHTML = `👤 <strong>${name}</strong> — 📱 ${phone}`;
+                    listTarget.appendChild(div);
+                });
+
+                hiddenField.value = textFormattedList;
+            }
+        } catch (ex) {
+            errorArea.innerText = "Sélection déconnectée ou annulée par l'utilisateur.";
+            errorArea.style.display = "block";
+        }
+    });
+
+    // Soumission du formulaire (Double action : Envoi Mail puis WhatsApp)
+    document.getElementById('generaliForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const formData = new FormData(form);
+        const emailEndpoint = "https://formspree.io/f/mojzgkwd"; // Votre lien Formspree définitif
+
+        // 1. Envoi asynchrone des données vers votre boîte yoc14@barbarbu.fr via Formspree
+        fetch(emailEndpoint, {
+            method: "POST",
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            console.log("Données du formulaire transmises avec succès.");
+        }).catch(error => {
+            console.error("Erreur d'acheminement du mail :", error);
+        });
+
+        // 2. Transition graphique vers l'écran de remerciement
+        document.getElementById('generaliForm').style.display = "none";
+        document.getElementById('thankYouScreen').style.display = "block";
+
+        // 3. Redirection automatique vers WhatsApp avec votre message personnalisé complet
+        setTimeout(() => {
+            window.location.href = "https://wa.me/?text=Hello%21%0ATu%20vas%20bient%C3%B4t%20recevoir%20un%20appel%20de%20Alexis%20Albertini%2C%20mon%20conseiller%20Generali.%20%F0%9F%93%9E%0A%0AJe%20recommande%20rarement%2C%20mais%20lui%2C%20il%20est%20vraiment%20top%20et%20de%20super%20conseil%20%21%20%F0%9F%91%8C%0A%0AEn%20g%C3%A9n%C3%A9ral%2C%20il%20fait%20r%C3%A9aliser%20de%20vraies%20%C3%A9conomies%20%F0%9F%98%89%F0%9F%92%B0%0A%0AIl%20peut%20m%C3%AAme%20se%20d%C3%A9placer%20directement%20chez%20toi%20si%20besoin.%20%F0%9F%9A%97%F0%9F%92%A8%0A%0AJe%20te%20conseille%20vivement%20de%20r%C3%A9pondre%20%C3%A0%20son%20appel%20ou%20de%20le%20recontacter.%20%F0%9F%93%B1%0A%0AVoici%20ses%20coordonn%C3%A9es%20pour%20l%27enregistrer%20%3A%0A%F0%9F%93%8C%20Alexis%20Albertini%0A0698533043%0ADis-moi%20quand%20il%20t%27a%20appel%C3%A9%20%21%20%E2%98%80%EF%B8%8F%0ABonne%20journ%C3%A9e%20%21%20%F0%9F%98%8E";
+        }, 200);
+    });
+</script>
+
+</body>
+</html>
